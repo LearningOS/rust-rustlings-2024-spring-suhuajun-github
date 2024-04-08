@@ -20,6 +20,7 @@ serde_json = "1.0.81"
 home = "0.5.3"
 glob = "0.3.0"
 tokio = { version = "1.21.2", features = ["full"] }
+mio = "0.8.11"
 
 [[bin]]
 name = "rustlings"
