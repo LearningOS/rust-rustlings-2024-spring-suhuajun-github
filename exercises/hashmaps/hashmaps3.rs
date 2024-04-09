@@ -14,14 +14,63 @@
 // Execute `rustlings hint hashmaps3` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
-
 use std::collections::HashMap;
+use std::ops::AddAssign;
 
 // A structure to store the goal details of a team.
 struct Team {
     goals_scored: u8,
     goals_conceded: u8,
+}
+
+impl AddAssign for Team {
+    fn add_assign(&mut self, other: Self) {
+        *self = Self {
+            goals_scored: self.goals_scored + other.goals_scored,
+            goals_conceded: self.goals_conceded + other.goals_conceded
+        };
+    }
+}
+
+// rust好麻烦啊
+/*
+impl Team {
+    fn new(goals_scored: u8 = 0, goals_conceded: u8 = 0) -> Team {
+        Team{goals_scored, goals_conceded}
+    }
+}
+*/
+
+/*
+macro_rules! team {
+    ($($($a:expr) ?) $($(, $b:expr) ?)) => {
+        let mut goals_scored = 0;
+        let mut goals_conceded = 0;
+        $(goals_scored = $a) ?
+        $(goals_conceded = $b) ?
+        Team{goals_scored, goals_conceded}
+    }
+}
+*/
+
+macro_rules! team {
+    ($($a:expr) ?) => {
+        {
+            let mut goals_scored = 0;
+            let goals_conceded = 0;
+            $(goals_scored = $a;) ?
+            Team{goals_scored, goals_conceded}
+        }
+    };
+    ($a:expr , $b:expr) => {
+        {
+            let mut goals_scored = 0;
+            let mut goals_conceded = 0;
+            goals_scored = $a;
+            goals_conceded = $b;
+            Team{goals_scored, goals_conceded}
+        }
+    }
 }
 
 fn build_scores_table(results: String) -> HashMap<String, Team> {
@@ -39,6 +88,14 @@ fn build_scores_table(results: String) -> HashMap<String, Team> {
         // will be the number of goals conceded from team_2, and similarly
         // goals scored by team_2 will be the number of goals conceded by
         // team_1.
+        /*
+        *scores.entry(team_1_name).or_insert(Team::new()) += Team::new(team_1_score, team_2_score);
+        *scores.entry(team_2_name).or_insert(Team::new()) += Team::new(team_2_score, team_1_score);
+        */
+
+        //let x = team!(1);
+        *scores.entry(team_1_name).or_insert(team!()) += team!(team_1_score, team_2_score);
+        *scores.entry(team_2_name).or_insert(team!()) += team!(team_2_score, team_1_score);
     }
     scores
 }
