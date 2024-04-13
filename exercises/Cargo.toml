@@ -1,0 +1,10 @@
+[package]
+name = "main"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "main-bin"
+path = "algorithm/algorithm2.rs"
+
+[dependencies]
