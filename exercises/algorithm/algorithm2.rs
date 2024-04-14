@@ -2,11 +2,12 @@
 	double linked list reverse
 	This problem requires you to reverse a doubly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
 use std::vec::*;
+use std::mem::swap;
+use std::ptr;
 
 #[derive(Debug)]
 struct Node<T> {
@@ -26,18 +27,18 @@ impl<T> Node<T> {
 }
 #[derive(Debug)]
 struct LinkedList<T> {
-    length: u32,
+    length: i32,
     start: Option<NonNull<Node<T>>>,
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: Default> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: Default> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -59,21 +60,31 @@ impl<T> LinkedList<T> {
         self.length += 1;
     }
 
-    pub fn get(&mut self, index: i32) -> Option<&T> {
-        self.get_ith_node(self.start, index)
-    }
-
-    fn get_ith_node(&mut self, node: Option<NonNull<Node<T>>>, index: i32) -> Option<&T> {
+    fn get_ith_node(&mut self, node: Option<NonNull<Node<T>>>, index: i32) -> Option<&mut T> {
         match node {
             None => None,
             Some(next_ptr) => match index {
-                0 => Some(unsafe { &(*next_ptr.as_ptr()).val }),
+                0 => Some(unsafe { &mut (*next_ptr.as_ptr()).val }),
                 _ => self.get_ith_node(unsafe { (*next_ptr.as_ptr()).next }, index - 1),
             },
         }
     }
-	pub fn reverse(&mut self){
+
+    pub fn get(&mut self, index: i32) -> Option<&mut T> {
+        self.get_ith_node(self.start, index)
+    }
+
+	pub fn reverse(&mut self) {
 		// TODO
+        let mut a: i32 = 0;
+        let mut b: i32 = self.length - 1;
+        while a < b {
+            let mut temp: T = T::default();
+            swap(self.get(a).unwrap(), &mut temp);
+            swap(&mut temp, self.get(b).unwrap());
+            swap(self.get(a).unwrap(), &mut temp);
+            a += 1; b -= 1;
+        }
 	}
 }
 

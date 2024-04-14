@@ -3,11 +3,23 @@
 	This problem requires you to implement a sorting algorithm
 	you can use bubble sorting, insertion sorting, heap sorting, etc.
 */
-// I AM NOT DONE
 
-fn sort<T>(array: &mut [T]){
+use std::cmp::PartialOrd;
+use std::mem::swap;
+
+fn sort<T: PartialOrd + Default>(array: &mut [T]){
 	//TODO
+    for i in 0..array.len() {
+        for j in (i + 1)..array.len() {
+            if array[i] < array[j] {continue}
+            let mut temp: T = T::default();
+            swap(&mut array[i], &mut temp);
+            swap(&mut temp, &mut array[j]);
+            swap(&mut array[i], &mut temp);
+        }
+    }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
