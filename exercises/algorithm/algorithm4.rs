@@ -3,7 +3,6 @@
 	This problem requires you to implement a basic interface for a binary tree
 */
 
-//I AM NOT DONE
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -18,17 +17,29 @@ where
     right: Option<Box<TreeNode<T>>>,
 }
 
+/*
+impl<T> TreeNode<T>
+where
+    T: Ord,
+{
+    // Insert a node into the tree
+    fn insert(&mut self, value: T) {
+        //TODO
+    }
+}
+*/
+
 #[derive(Debug)]
 struct BinarySearchTree<T>
 where
-    T: Ord,
+    T: Ord + std::fmt::Debug
 {
     root: Option<Box<TreeNode<T>>>,
 }
 
 impl<T> TreeNode<T>
 where
-    T: Ord,
+    T: Ord + std::fmt::Debug
 {
     fn new(value: T) -> Self {
         TreeNode {
@@ -41,35 +52,40 @@ where
 
 impl<T> BinarySearchTree<T>
 where
-    T: Ord,
+    T: Ord + std::fmt::Debug
 {
 
     fn new() -> Self {
         BinarySearchTree { root: None }
     }
 
+    fn insert_sub(root: &mut Option<Box<TreeNode<T>>>, value: T) {
+        if let None = root {*root = Some(Box::new(TreeNode::new(value))); return;}
+        let node: &mut Box<TreeNode<T>> = root.as_mut().unwrap();
+        if node.value == value {return;}
+        if value < node.value {Self::insert_sub(&mut node.left, value); return;}
+        Self::insert_sub(&mut node.right, value);
+    }
+
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
-        //TODO
+        Self::insert_sub(&mut self.root, value)
+        //; dbg!(&self);
+    }
+
+    fn search_sub(root: &Option<Box<TreeNode<T>>>, value: &T) -> bool {
+        if let None = root {return false;}
+        let node = root.as_ref().unwrap();
+        if *value == node.value {return true;}
+        if *value < node.value {return Self::search_sub(&node.left, value);}
+        return Self::search_sub(&node.right, value);
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
-        //TODO
-        true
+        Self::search_sub(&self.root, &value)
     }
 }
-
-impl<T> TreeNode<T>
-where
-    T: Ord,
-{
-    // Insert a node into the tree
-    fn insert(&mut self, value: T) {
-        //TODO
-    }
-}
-
 
 #[cfg(test)]
 mod tests {
