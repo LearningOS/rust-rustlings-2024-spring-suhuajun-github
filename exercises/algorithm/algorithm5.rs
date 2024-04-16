@@ -3,10 +3,11 @@
 	This problem requires you to implement a basic BFS algorithm
 */
 
-//I AM NOT DONE
 use std::collections::VecDeque;
+use std::collections::HashMap;
 
 // Define a graph
+#[derive(Debug)]
 struct Graph {
     adj: Vec<Vec<usize>>, 
 }
@@ -27,11 +28,27 @@ impl Graph {
 
     // Perform a breadth-first search on the graph, return the order of visited nodes
     fn bfs_with_return(&self, start: usize) -> Vec<usize> {
-        
-		//TODO
-
-        let mut visit_order = vec![];
-        visit_order
+        let mut result: Vec<usize> = vec!();
+        let mut status = HashMap::<usize, bool>::new();
+        let mut queue = VecDeque::<usize>::new();
+        queue.push_back(start);
+        status.entry(start).or_insert(false);
+        while !queue.is_empty() {
+            //let c = queue.pop_back().unwrap();
+            let c = queue.pop_front().unwrap();
+            status.insert(c, true);
+            result.push(c);
+            //dbg!(&status);
+            //dbg!(&queue);
+            //dbg!(&result);
+            for i in &self.adj[c] {
+                //dbg!(&i);
+                if status.get(i).is_some() {continue}
+                queue.push_back(*i);
+                status.entry(*i).or_insert(false);
+            }
+        }
+        result
     }
 }
 
@@ -51,7 +68,10 @@ mod tests {
         graph.add_edge(2, 3);
         graph.add_edge(3, 4);
 
+        //dbg!(&graph);
+
         let visited_order = graph.bfs_with_return(0);
+        //dbg!(&visited_order);
         assert_eq!(visited_order, vec![0, 1, 4, 2, 3]);
     }
 

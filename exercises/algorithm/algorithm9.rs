@@ -2,14 +2,14 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
 
+#[derive(Debug)]
 pub struct Heap<T>
 where
-    T: Default,
+    T: Default + std::fmt::Debug
 {
     count: usize,
     items: Vec<T>,
@@ -18,13 +18,14 @@ where
 
 impl<T> Heap<T>
 where
-    T: Default,
+    T: Default + std::fmt::Debug
 {
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
             count: 0,
-            items: vec![T::default()],
-            comparator,
+            //items: vec![T::default()],
+            items: vec![],
+            comparator
         }
     }
 
@@ -37,15 +38,13 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value);
+        self.count += 1;
+        self.up(self.count);
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
         idx / 2
-    }
-
-    fn children_present(&self, idx: usize) -> bool {
-        self.left_child_idx(idx) <= self.count
     }
 
     fn left_child_idx(&self, idx: usize) -> usize {
@@ -56,36 +55,77 @@ where
         self.left_child_idx(idx) + 1
     }
 
-    fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
-    }
-}
-
-impl<T> Heap<T>
-where
-    T: Default + Ord,
-{
-    /// Create a new MinHeap
-    pub fn new_min() -> Self {
-        Self::new(|a, b| a < b)
+    fn children_present(&self, idx: usize) -> bool {
+        idx <= self.count
     }
 
-    /// Create a new MaxHeap
-    pub fn new_max() -> Self {
-        Self::new(|a, b| a > b)
+    /*
+    fn up(&mut self, idx: usize) {
+        let mut ci = idx;
+        loop {
+            let pi = self.parent_idx(ci);
+            if pi == 0 {break}
+            if !(self.comparator)(&self.items[ci - 1], &self.items[pi - 1]) {break}
+            self.items.swap(ci - 1, pi - 1);
+            ci = pi;
+        }
+    }
+    */
+    fn up(&mut self, idx: usize) {
+        let ci = idx;
+        let pi = self.parent_idx(ci);
+        if pi == 0 {return;}
+        if (self.comparator)(&self.items[pi - 1], &self.items[ci - 1]) {return}
+        self.items.swap(ci - 1, pi - 1);
+        self.up(pi);
+    }
+
+    fn down(&mut self, idx: usize) {
+        let li = self.left_child_idx(idx);
+        let ri = self.right_child_idx(idx);
+        let lp = self.children_present(li);
+        let rp = self.children_present(ri);
+        if !lp && !rp {return}
+        let si = if rp && (self.comparator)(&self.items[ri - 1], &self.items[li - 1]) {ri} else {li};
+        //dbg!(&si);
+        //dbg!(&idx);
+        //dbg!(&self);
+        if (self.comparator)(&self.items[idx - 1], &self.items[si - 1]) {return}
+        //dbg!(&self);
+        //self.items.swap(idx, si);
+        self.items.swap(idx - 1, si - 1);
+        self.down(si);
     }
 }
 
 impl<T> Iterator for Heap<T>
 where
-    T: Default,
+    T: Default + Copy + std::fmt::Debug
 {
     type Item = T;
 
+    /*
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        //dbg!(&self.iter_status);
+        //dbg!(&self.len());
+        //return None;
+        //if self.iter_status >= self.count() {self.iter_status = 0; return None;}
+        if self.iter_status >= self.len() {self.iter_status = 0; return None;}
+        let c = self.iter_status;
+        self.iter_status += 1;
+        Some(self.items[c])
+    }
+    */
+    fn next(&mut self) -> Option<T> {
+        if self.len() == 0 {return None}
+        let result = Some(self.items[0]);
+        // TODO
+        self.count -= 1;
+        //self.items[0] = self.items.remove(self.count);
+        self.items[0] = self.items[self.count];
+        self.items.remove(self.count);
+        self.down(1);
+        result
     }
 }
 
@@ -95,7 +135,7 @@ impl MinHeap {
     #[allow(clippy::new_ret_no_self)]
     pub fn new<T>() -> Heap<T>
     where
-        T: Default + Ord,
+        T: Default + Ord + std::fmt::Debug
     {
         Heap::new(|a, b| a < b)
     }
@@ -107,7 +147,7 @@ impl MaxHeap {
     #[allow(clippy::new_ret_no_self)]
     pub fn new<T>() -> Heap<T>
     where
-        T: Default + Ord,
+        T: Default + Ord + std::fmt::Debug
     {
         Heap::new(|a, b| a > b)
     }
@@ -119,6 +159,7 @@ mod tests {
     #[test]
     fn test_empty_heap() {
         let mut heap = MaxHeap::new::<i32>();
+        //dbg!(&heap.next());
         assert_eq!(heap.next(), None);
     }
 
