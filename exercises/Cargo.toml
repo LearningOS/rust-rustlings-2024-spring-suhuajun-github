@@ -5,6 +5,6 @@ edition = "2021"
 
 [[bin]]
 name = "main-bin"
-path = "algorithm/algorithm9.rs"
+path = "algorithm/algorithm10.rs"
 
 [dependencies]
